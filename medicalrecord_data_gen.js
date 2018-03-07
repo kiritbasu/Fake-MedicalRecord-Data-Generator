@@ -19,7 +19,7 @@ chance.mixin({
 });
 
 chance.mixin({
-'p_problems': function() {
+'p_diagnosis': function() {
     return chance.pickset([
       'C00.3 Malignant neoplasm of upper lip, inner aspect',
       'C00.8 Malignant neoplasm of overlapping sites of lip',
@@ -63,7 +63,7 @@ function medical_record()
     this.birth_date = chance.birthday({string: true, type: 'adult'});
     this.home_phone = chance.phone();
     this.address = chance.p_address();
-    this.problems = chance.p_problems();
+    this.diagnosis = chance.p_diagnosis();
     this.gender = chance.gender();
     this.marital_status = chance.pickone(['Single','Married','Divorced','Widowed']);
     this.contact_by = chance.pickone(['email','phone','postal mail']);
