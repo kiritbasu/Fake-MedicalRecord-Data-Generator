@@ -104,7 +104,7 @@ function payment_info(_patient_name, _patient_id, _patient_account_number)
 {
     this.patient_id = _patient_id;
     this.patient_account_number = _patient_account_number;
-    this.admision_date = chance.date({year: 2017, month: 01, string:true});
+    this.admission_date = chance.date({year: 2017, month: 01, string:true});
     this.charge_date = chance.date({year: 2017, month: 02, string:true}); ;
     this.purchase_items = chance.p_purchase_items();
     this.payment_info = chance.p_payment_info(_patient_name);
