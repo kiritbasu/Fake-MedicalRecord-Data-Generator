@@ -2,10 +2,6 @@ var Chance = require('chance');
 var chance = new Chance();
 
 
-var p_lastname = chance.last();
-var p_patient_id = chance.ssn();
-var p_patient_name = chance.first({ gender: "male" }) + " " + p_lastname;
-
 chance.mixin({
 'p_address': function() {
     return {
@@ -19,7 +15,7 @@ chance.mixin({
 });
 
 chance.mixin({
-'p_problems': function() {
+'p_diagnosis': function() {
     return chance.pickset([
       'C00.3 Malignant neoplasm of upper lip, inner aspect',
       'C00.8 Malignant neoplasm of overlapping sites of lip',
@@ -33,14 +29,14 @@ chance.mixin({
 });
 
 chance.mixin({
-'p_insurance': function() {
+'p_insurance': function(_lastname) {
     return {
       group_number: "A" + chance.pad(chance.natural({min: 1, max: 100000}), 6),
       id_number: chance.pad(chance.natural({min: 1, max: 99}), 2) + '-' +
                 chance.pad(chance.natural({min: 1, max: 999}), 3) + '-' +
                 chance.pad(chance.natural({min: 1, max: 9999}), 4),
       spouse_birth_date: chance.birthday({ string: true, year: chance.year({ min: 1950, max: 2000 }) }),
-      spouse_name: chance.first({ gender: "female" }) + " " + p_lastname
+      spouse_name: chance.first({ gender: "female" }) + " " + _lastname
     }
 }
 });
@@ -53,27 +49,26 @@ chance.mixin({
 }
 });
 
-var p_mrn = chance.p_mrn();
 
 
-function medical_record()
+function medical_record(patient_name, lastname, patient_id, internal_mrn)
 {
-    this.patient_name = p_patient_name;
-    this.patient_id = p_patient_id;
+    this.patient_name = patient_name;
+    this.patient_id = patient_id;
     this.birth_date = chance.birthday({string: true, type: 'adult'});
     this.home_phone = chance.phone();
     this.address = chance.p_address();
-    this.problems = chance.p_problems();
+    this.diagnosis = chance.p_diagnosis();
     this.gender = chance.gender();
     this.marital_status = chance.pickone(['Single','Married','Divorced','Widowed']);
     this.contact_by = chance.pickone(['email','phone','postal mail']);
     this.race = chance.pickone(['White','Black', 'Asian', 'American Indian', 'Native Hawaiian']);
     this.social_security_number = chance.ssn();
     this.language = "English";
-    this.medical_record_number = p_mrn;
+    this.medical_record_number = internal_mrn;
     this.external_mrn = chance.p_mrn();
     this.email = chance.email();
-    this.insurance = chance.p_insurance();
+    this.insurance = chance.p_insurance(lastname);
 
 }
 
@@ -94,26 +89,33 @@ chance.mixin({
 chance.mixin({
 'p_purchase_items': function() {
     return chance.pickset([
-      'PRINIVIL TABS 20 MG (LISINOPRIL) 1 po qd',
-      'HUMULIN INJ 70/30 (INSULIN REG & ISOPHANE (HUMAN)) 20 units ac breakfast'
+      '[PRINIVIL TABS] [20 MG] [LISINOPRIL] [1 po qd]',
+      '[HUMULIN INJ] [70/30] [INSULIN REG & ISOPHANE HUMAN] [20 units ac breakfast]'
     ],2)
 }
 });
 
-function payment_info(_patient_name, _patient_id, _patient_account_number)
+function payment_info(patient_name, patient_id, patient_account_number)
 {
-    this.patient_id = _patient_id;
-    this.patient_account_number = _patient_account_number;
-    this.admision_date = chance.date({year: 2017, month: 01, string:true});
+
+    this.patient_id = patient_id;
+    this.patient_account_number = patient_account_number;
+    this.admission_date = chance.date({year: 2017, month: 01, string:true});
     this.charge_date = chance.date({year: 2017, month: 02, string:true}); ;
     this.purchase_items = chance.p_purchase_items();
-    this.payment_info = chance.p_payment_info(_patient_name);
+    this.payment_info = chance.p_payment_info(patient_name);
 }
 
 function print_medical_record() {
   while(true) {
-    var instance = new medical_record();
-    var pi = new payment_info(p_patient_name, p_patient_id, p_mrn)
+
+    var _lastname = chance.last();
+    var _patient_id = "Z" + chance.pad(chance.natural({min: 1, max: 100000}), 6);
+    var _patient_name = chance.first({ gender: "male" }) + " " + _lastname;
+    var _internal_mrn = chance.p_mrn();
+
+    var instance = new medical_record(_patient_name, _lastname, _patient_id, _internal_mrn);
+    var pi = new payment_info(_patient_name, _patient_id, _internal_mrn)
     console.log(JSON.stringify(instance));
     console.log(JSON.stringify(pi));
   }
