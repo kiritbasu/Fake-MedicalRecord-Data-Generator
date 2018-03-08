@@ -97,9 +97,14 @@ chance.mixin({
 
 function payment_info(patient_name, patient_id, patient_account_number)
 {
+<<<<<<< HEAD
 
     this.patient_id = patient_id;
     this.patient_account_number = patient_account_number;
+=======
+    this.patient_id = _patient_id;
+    this.patient_account_number = _patient_account_number;
+>>>>>>> e6dca44c8c1221ee594643062ebb153964cc1e54
     this.admission_date = chance.date({year: 2017, month: 01, string:true});
     this.charge_date = chance.date({year: 2017, month: 02, string:true}); ;
     this.purchase_items = chance.p_purchase_items();
