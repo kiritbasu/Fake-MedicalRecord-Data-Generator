@@ -69,6 +69,7 @@ function medical_record(patient_name, lastname, patient_id, internal_mrn)
     this.external_mrn = chance.p_mrn();
     this.email = chance.email();
     this.insurance = chance.p_insurance(lastname);
+    this.payments = chance.p_payments(patient_name, patient_id, internal_mrn);
 
 }
 
@@ -95,16 +96,18 @@ chance.mixin({
 }
 });
 
-function payment_info(patient_name, patient_id, patient_account_number)
-{
+chance.mixin({
+'p_payments': function(patient_name, patient_id, patient_account_number) {
 
-    this.patient_id = patient_id;
-    this.patient_account_number = patient_account_number;
-    this.admission_date = chance.date({year: 2017, month: 01, string:true});
-    this.charge_date = chance.date({year: 2017, month: 02, string:true}); ;
-    this.purchase_items = chance.p_purchase_items();
-    this.payment_info = chance.p_payment_info(patient_name);
+  return {
+    patient_account_number: patient_account_number,
+    admission_date: chance.date({year: 2017, month: 01, string:true}),
+    charge_date: chance.date({year: 2017, month: 02, string:true}),
+    purchase_items: chance.p_purchase_items(),
+    payment_info: chance.p_payment_info(patient_name)
+  }
 }
+});
 
 function print_medical_record() {
   while(true) {
@@ -115,9 +118,7 @@ function print_medical_record() {
     var _internal_mrn = chance.p_mrn();
 
     var instance = new medical_record(_patient_name, _lastname, _patient_id, _internal_mrn);
-    var pi = new payment_info(_patient_name, _patient_id, _internal_mrn)
     console.log(JSON.stringify(instance));
-    console.log(JSON.stringify(pi));
   }
 }
 
